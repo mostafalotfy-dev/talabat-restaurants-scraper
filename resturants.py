@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 from time import sleep
 import requests
-import json
+
 import pandas as pd
 import os
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("language",help="enter the language (ar-KW,en-US)",choices=("en-US","ar-KW"))
 parser.add_argument("suffix",help="the csv output file suffix")
+parser.add_argument("areanumber")
 args = parser.parse_args()
 
 headers = {
@@ -38,8 +39,8 @@ def scrape(result,n):
         n+=1
         result = results[n]
         lat,long = result["polc"].split(",")
-        link = ("https://vendors.talabat.com/vendor-list/v1/vendors?areaid={}&countrycode=9&lat={}&lon={}&page=1&size=100000&vertical_id=0&fpPaddingStrategy=none"
-        .format(result["id"],lat,long))
+        link = ("https://vendors.talabat.com/vendor-list/v1/vendors?areaid={}&countrycode={}&lat={}&lon={}&page=1&size=100000&vertical_id=0&fpPaddingStrategy=none"
+        .format(result["id"],args.areanumber,lat,long))
         response = requests.get(link,headers=headers,cookies=cookies)
        
         if len(response.text) > 0:
@@ -55,9 +56,9 @@ def scrape(result,n):
             sleep(10) # bybass cloudflare , do not change it
         
 
-with open("latlong.json") as f:
-    file = json.load(f)
-    results = file["result"]
+jsonresponse= requests.get('https://api.talabat.com/apiAndroid/v1/apps/areas/{}'.format(args.areanumber))
+file = jsonresponse.json()
+results = file["result"]
     
 
 
