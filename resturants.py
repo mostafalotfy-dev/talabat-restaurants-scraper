@@ -34,6 +34,9 @@ cookies = {"__cf_bm":".25KquhS2iYyCQtF82QAdk2sQ-1654550601-0-AdaN290vKqUcOOkxHWg
     "AWSALBCORS":"75EuMmE23AsGI5uStTq3YkBGQj/H0M7V9f4VxmqEkQgmY9dqTv/jsILYpkNj92iL5RauZIi4LQxwkp2BxSh8yYNuD+hosiE19TmVxnvLt1ZnDzBuVNInATHV9VS4"}
 
 def scrape(result,n):
+    while True:
+        n+=1
+        result = results[n]
         lat,long = result["polc"].split(",")
         link = ("https://vendors.talabat.com/vendor-list/v1/vendors?areaid={}&countrycode=9&lat={}&lon={}&page=1&size=100000&vertical_id=0&fpPaddingStrategy=none"
         .format(result["id"],lat,long))
@@ -50,9 +53,7 @@ def scrape(result,n):
             df.to_csv(open("resturants_{}.csv".format(args.suffix),"a"),header=False)
             open("{}_id".format(args.suffix),"w").write(str(n))
             sleep(10) # bybass cloudflare , do not change it
-            
-        scrape(results[n+1],n+1)
-       
+        
 
 with open("latlong.json") as f:
     file = json.load(f)
