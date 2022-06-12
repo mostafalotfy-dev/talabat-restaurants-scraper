@@ -38,25 +38,29 @@ def scrape(result,n):
         n+=1
        
         result = results[n]
-        lat,long = result["polc"].split(",")
-        link = ("https://vendors.talabat.com/vendor-list/v1/vendors?areaid={}&countrycode={}&lat={}&lon={}&page=1&size=100000&vertical_id=0&fpPaddingStrategy=none"
-        .format(result["id"],args.areanumber,lat,long))
-        response = requests.get(link,headers=headers,cookies=cookies)
-        if len(response.text) > 0:
-            jsonResponse = response.json()
-            df = pd.DataFrame(jsonResponse["vendors"])
-            if "cus" in df:
-             categories = df.pop("cus")        
-             for category in categories:
-                pd.DataFrame(category).to_csv(open("categories%s.csv"%args.suffix,"a"),header=False)
-            df.to_csv(open("resturants_{}.csv".format(args.suffix),"a"),header=False)
+        if result["polc"] != "":
+            lat,long = result["polc"].split(",")
+            link = ("https://vendors.talabat.com/vendor-list/v1/vendors?areaid={}&countrycode={}&lat={}&lon={}&page=1&size=100000&vertical_id=0&fpPaddingStrategy=none"
+            .format(result["id"],args.areanumber,lat,long))
+            response = requests.get(link,headers=headers,cookies=cookies)
+            if len(response.text) > 0:
+                jsonResponse = response.json()
+                jsonResponse["areanumber"] = args.areanumber
+                df = pd.DataFrame(jsonResponse["vendors"])
+                if "cus" in df:
+                    categories = df.pop("cus")        
+                    for category in categories:
+                        pd.DataFrame(category).to_csv(open("categories%s.csv"%args.suffix,"a"),header=False)
+                    df.to_csv(open("resturants_{}.csv".format(args.suffix),"a"),header=False)
             open("{}_id".format(args.suffix),"w").write(str(n))
             sleep(10) # bybass cloudflare , do not change it
         
 
 jsonresponse = requests.get('https://api.talabat.com/apiAndroid/v1/apps/areas/{}'.format(args.areanumber))
-file = jsonresponse.json()
-results = file["result"]
+
+jsonresponse = jsonresponse.json()
+
+results = jsonresponse["result"]
 
 if __name__ == "__main__":
     if os.path.exists("{}_id".format(args.suffix)):
