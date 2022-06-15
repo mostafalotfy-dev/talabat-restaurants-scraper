@@ -36,7 +36,6 @@ cookies = {"__cf_bm":".25KquhS2iYyCQtF82QAdk2sQ-1654550601-0-AdaN290vKqUcOOkxHWg
 def scrape(result,n):
     while True:
         n+=1
-       
         result = results[n]
         if result["polc"] != "":
             lat,long = result["polc"].split(",")
@@ -51,7 +50,7 @@ def scrape(result,n):
                     categories = df.pop("cus")        
                     for category in categories:
                         pd.DataFrame(category).to_csv(open("categories%s.csv"%args.suffix,"a"),header=False)
-                    df.to_csv(open("resturants_{}.csv".format(args.suffix),"a"),header=False)
+                    df.to_csv(open("restaurants_{}.csv".format(args.suffix),"a"),header=False)
             open("{}_id".format(args.suffix),"w").write(str(n))
             sleep(10) # bybass cloudflare , do not change it
         
